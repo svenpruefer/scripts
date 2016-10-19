@@ -1,11 +1,22 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import codecs
 
 # Oeffne Tabelle, die per Bericht aus Base exportiert wird. Sie darf als Zwischenzeilen nur solche mit Beginn "ZirkelID" haben.
 name = raw_input("Enter file:")
 if len(name) < 1 : name = "liste.csv"
+
+# Lese Titelzeile
 handle = open(name, 'r')
+for line in handle:
+    line = line.strip()
+    if line.split(";")[0] == "ZirkelID":
+        title = line
+        break
+handle.close()
 
 # Erzeuge Liste der Zirkel
+handle = open(name, 'r')
 list_of_ids = []
 for line in handle:
     line = line.strip()
@@ -21,6 +32,7 @@ handle.close()
 # Erzeuge csv Dateien fuer jeden Zirkel. Die Schleife laeuft absurd oft, ist aber egal fuer unsere Anwendungen. handle muss neu geladen werden, weil oben eventuelle Leerzeichen von strip() entfernt werde.
 for zirkel in list_of_ids:
     file = codecs.open(zirkel + '.csv','w+','utf-8-sig') # Lege Datei an fuer neuen Zirkel
+    file.write("".join(title).decode('UTF-8') + "\n") # Fuege Titelleiste hinzu
     handle = open(name, 'r')
     for line in handle:
         line = line.strip()
