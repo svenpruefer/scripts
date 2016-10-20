@@ -1,0 +1,2 @@
+cat FILE | tr '; ' '\n' | sort -uf | awk '/./'
+
