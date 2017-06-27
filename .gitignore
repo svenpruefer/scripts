@@ -1,6 +1,9 @@
 # Extra Stuff
 liste.csv
 test/
+mathezirkel/Praktikum/
+mathezirkel/beispiel-tabelle-1.csv
+mathezirkel/csv/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
