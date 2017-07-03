@@ -6,6 +6,7 @@
 
 import codecs
 import csv
+import pdb
 
 #######################
 # Select file to open #
@@ -137,10 +138,47 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'instrumente.csv','wb','ut
 # Write Krankheiten file #
 ##########################
 
+with open(csvFileName) as csvFile, codecs.open(pfad + 'krankheit.csv','wb','utf-8-sig') as krankheitenFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    columnNames = ["Nachname", "Vorname", "Klasse", "Krankheit"]
+    krankheitenFileWriter = csv.DictWriter(krankheitenFile, fieldnames = columnNames, delimiter = ";")
+    
+    krankheitenFileWriter.writeheader()
+    for row in csv.DictReader(csvFile, delimiter = ";"):
+        if row["Krankheit"].strip() :
+            krankheitenFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Krankheit" : row["Krankheit"], "Klasse" : row["KlasseID"]})
+            
 ##########################
 # Write Medikamente file #
 ##########################
 
+with open(csvFileName) as csvFile, codecs.open(pfad + 'medikamente.csv','wb','utf-8-sig') as medikamenteFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    columnNames = ["Nachname", "Vorname", "Klasse", "Medikamente"]
+    medikamenteFileWriter = csv.DictWriter(medikamenteFile, fieldnames = columnNames, delimiter = ";")
+    
+    medikamenteFileWriter.writeheader()
+    for row in csv.DictReader(csvFile, delimiter = ";"):
+        if row["Medikamente"].strip() :
+            medikamenteFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Medikamente" : row["Medikamente"], "Klasse" : row["KlasseID"]})
+
+############################
+# Write Klassenstufen file #
+############################
+
+with open(csvFileName) as csvFile, codecs.open(pfad + 'klassenstufen.csv','wb','utf-8-sig') as klassenstufenFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    columnNames = ["Klasse", "Anzahl"]
+    klassenstufenFileWriter = csv.DictWriter(klassenstufenFile, fieldnames = columnNames, delimiter = ";")
+
+    anzahl = {"5" : 0, "6" : 0, "7" : 0, "8" : 0, "9" : 0, "10" : 0, "11" : 0, "12" : 0}
+    klassenstufenFileWriter.writeheader()
+    for row in csv.DictReader(csvFile, delimiter = ";"):
+        anzahl[row["KlasseID"].strip()] = anzahl[row["KlasseID"].strip()] + 1
+
+    for klasse in range(5,13):
+        klassenstufenFileWriter.writerow({ "Klasse" : str(klasse), "Anzahl" : str(anzahl[str(klasse)])})
+            
 #########################
 # Write Geburtstag file #
 #########################
