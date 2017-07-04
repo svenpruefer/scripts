@@ -7,6 +7,7 @@
 import codecs
 import csv
 import pdb
+import datetime
 
 #######################
 # Select file to open #
@@ -183,9 +184,41 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'klassenstufen.csv','wb','
 # Write Geburtstag file #
 #########################
 
+# Stupid Hack: In order to not just test for birthdays during the Mathecamp in that particular year I convert everything to 1900 and compare days and months there.
+
+startTimeMathecamp = datetime.date(1900,8,19)
+endTimeMathecamp = datetime.date(1900,8,27)
+
+with open(csvFileName) as csvFile, codecs.open(pfad + 'geburtstagskinder.csv','wb','utf-8-sig') as geburtstagskinderFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    columnNames = ["Nachname", "Vorname", "Klasse", "Geburtstag"]
+    geburtstagskinderFileWriter = csv.DictWriter(geburtstagskinderFile, fieldnames = columnNames, delimiter = ";")
+
+    geburtstagskinderFileWriter.writeheader()
+    for row in csv.DictReader(csvFile, delimiter = ";"):
+        [tag, monat, jahr] = [int(i) for i in row["Geburtstag"].strip().split(".")]
+        geburtstag = datetime.date(jahr, monat, tag).replace(year = 1900)
+        if geburtstag >= startTimeMathecamp and geburtstag <= endTimeMathecamp:
+            geburtstagskinderFileWriter.writerow({ "Klasse" : row["KlasseID"], "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Geburtstag" : row["Geburtstag"]})
+
 ############################
 # Write Themenwünsche file #
 ############################
+
+with open(csvFileName) as csvFile, codecs.open(pfad + 'themenwuensche.csv','wb','utf-8-sig') as themenwuenscheFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    columnNames = ["Klasse", "Themenwünsche"]
+    themenwuenscheFileWriter = csv.DictWriter(themenwuenscheFile, fieldnames = columnNames, delimiter = ";")
+
+    themenwuensche = {"5" : "", "6" : "", "7" : "", "8" : "", "9" : "", "10" : "", "11" : "", "12" : ""}
+    themenwuenscheFileWriter.writeheader()
+    for row in csv.DictReader(csvFile, delimiter = ";"):
+        wunsch = row["Themenwünsche"]
+        if wunsch:
+            themenwuensche[row["KlasseID"].strip()] = ", ".join((themenwuensche[row["KlasseID"].strip()], wunsch))
+
+    for klasse in range(5,13):
+        themenwuenscheFileWriter.writerow({ "Klasse" : str(klasse), "Themenwünsche" : themenwuensche[str(klasse)][2:] })
 
 ##############################
 # Write Bereits-bezahlt file #
@@ -198,3 +231,18 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'klassenstufen.csv','wb','
 ############################
 # Write Emailadressen file #
 ############################
+
+# Does no parsing or removing double entries at the moment!
+
+emailAdressen = ""
+
+with open(csvFileName) as csvFile, codecs.open(pfad + 'emailAdressen.txt','wb','utf-8-sig') as emailAdressenFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    
+    for row in csv.DictReader(csvFile, delimiter = ";"):
+        if row["E-Mail Eltern"].strip():
+            emailAdressen = emailAdressen + ", " + row["E-Mail Eltern"].strip()
+        if row["E-Mail Schüler"].strip():
+            emailAdressen = emailAdressen + ", " + row["E-Mail Schüler"].strip()
+
+    emailAdressenFile.write(emailAdressen[2:])
