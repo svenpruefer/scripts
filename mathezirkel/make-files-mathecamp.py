@@ -8,6 +8,7 @@ import codecs
 import csv
 import pdb
 import datetime
+import networkx as nx
 
 #######################
 # Select file to open #
@@ -32,7 +33,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'anreise-bus.csv','wb','ut
     anzahl = 0
     
     anreiseBusFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if "Bus" in row["Anreise"]:
             anreiseBusFileWriter.writerow({ "Square" : u"\u25A1 ", "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Notfallnummer 1" : row["Notfallnummer 1"], "Notfallnummer 2": row["Notfallnummer 2"], "Notfallnummer 3" : row["Notfallnummer 3"]})
             anzahl = anzahl + 1
@@ -50,7 +51,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'anreise-privat.csv','wb',
     anzahl = 0
     
     anreisePrivatFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if "Privat" in row["Anreise"]:
             anreisePrivatFileWriter.writerow({ "Square" : u"\u25A1 ", "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Notfallnummer 1" : row["Notfallnummer 1"], "Notfallnummer 2": row["Notfallnummer 2"], "Notfallnummer 3" : row["Notfallnummer 3"]})
             anzahl = anzahl + 1
@@ -68,7 +69,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'abreise-bus.csv','wb','ut
     anzahl = 0
     
     abreiseBusFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if "Bus" in row["Abreise"]:
             abreiseBusFileWriter.writerow({ "Square" : u"\u25A1 ", "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Notfallnummer 1" : row["Notfallnummer 1"], "Notfallnummer 2": row["Notfallnummer 2"], "Notfallnummer 3" : row["Notfallnummer 3"]})
             anzahl = anzahl + 1
@@ -86,7 +87,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'abreise-privat.csv','wb',
     anzahl = 0
         
     abreisePrivatFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if "Privat" in row["Abreise"]:
             abreisePrivatFileWriter.writerow({ "Square" : u"\u25A1 ", "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Notfallnummer 1" : row["Notfallnummer 1"], "Notfallnummer 2": row["Notfallnummer 2"], "Notfallnummer 3" : row["Notfallnummer 3"]})
             anzahl = anzahl + 1
@@ -103,7 +104,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'ernaehrungseinschraenkung
     ernaehrungFileWriter = csv.DictWriter(ernaehrungFile, fieldnames = columnNames, delimiter = ";")
     
     ernaehrungFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if row["Ernährung"].strip():
             ernaehrungFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Ernährung" : row["Ernährung"]})
             
@@ -117,7 +118,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'fahrgemeinschaft.csv','wb
     fahrgemeinschaftFileWriter = csv.DictWriter(fahrgemeinschaftFile, fieldnames = columnNames, delimiter = ";")
     
     fahrgemeinschaftFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if row["Fahrgemeinschaft"] == "WAHR":
             fahrgemeinschaftFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "PLZ" : row["PLZ"], "Ort" : row["Ort"], "E-Mail Eltern" : row["E-Mail Eltern"], "E-Mail Schüler" : row["E-Mail Schüler"]})
             
@@ -145,7 +146,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'krankheit.csv','wb','utf-
     krankheitenFileWriter = csv.DictWriter(krankheitenFile, fieldnames = columnNames, delimiter = ";")
     
     krankheitenFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if row["Krankheit"].strip() :
             krankheitenFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Krankheit" : row["Krankheit"], "Klasse" : row["KlasseID"]})
             
@@ -159,7 +160,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'medikamente.csv','wb','ut
     medikamenteFileWriter = csv.DictWriter(medikamenteFile, fieldnames = columnNames, delimiter = ";")
     
     medikamenteFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if row["Medikamente"].strip() :
             medikamenteFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Medikamente" : row["Medikamente"], "Klasse" : row["KlasseID"]})
 
@@ -174,7 +175,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'klassenstufen.csv','wb','
 
     anzahl = {"5" : 0, "6" : 0, "7" : 0, "8" : 0, "9" : 0, "10" : 0, "11" : 0, "12" : 0}
     klassenstufenFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         anzahl[row["KlasseID"].strip()] = anzahl[row["KlasseID"].strip()] + 1
 
     for klasse in range(5,13):
@@ -195,7 +196,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'geburtstagskinder.csv','w
     geburtstagskinderFileWriter = csv.DictWriter(geburtstagskinderFile, fieldnames = columnNames, delimiter = ";")
 
     geburtstagskinderFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         [tag, monat, jahr] = [int(i) for i in row["Geburtstag"].strip().split(".")]
         geburtstag = datetime.date(jahr, monat, tag).replace(year = 1900)
         if geburtstag >= startTimeMathecamp and geburtstag <= endTimeMathecamp:
@@ -212,7 +213,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'themenwuensche.csv','wb',
 
     themenwuensche = {"5" : "", "6" : "", "7" : "", "8" : "", "9" : "", "10" : "", "11" : "", "12" : ""}
     themenwuenscheFileWriter.writeheader()
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         wunsch = row["Themenwünsche"]
         if wunsch:
             themenwuensche[row["KlasseID"].strip()] = ", ".join((themenwuensche[row["KlasseID"].strip()], wunsch))
@@ -224,9 +225,47 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'themenwuensche.csv','wb',
 # Write Bereits-bezahlt file #
 ##############################
 
+with open(csvFileName) as csvFile, codecs.open(pfad + 'bereits-bezahlt.csv','wb','utf-8-sig') as bereitsBezahltFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    columnNames = ["Nachname", "Vorname", "Zu Bezahlen", "Bereits Bezahlt", "Differenz"]
+    bereitsBezahltFileWriter = csv.DictWriter(bereitsBezahltFile, fieldnames = columnNames, delimiter = ";")
+
+    bereitsBezahltFileWriter.writeheader()
+    for row in csvFileReader:
+        if row["Bezahlter Betrag"].strip():
+            bezahlt = int(row["Bezahlter Betrag"])
+        else:
+            bezahlt = 0
+
+        if row["Camppreis"].strip():
+            camppreis = int(row["Camppreis"])
+        else:
+            camppreis = 0
+
+        differenz = bezahlt - camppreis
+        bereitsBezahltFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Zu Bezahlen" : row["Camppreis"], "Bereits Bezahlt" : row["Bezahlter Betrag"], "Differenz" : str(differenz)})
+    
 ###########################
 # Write Zimmerwunsch file #
 ###########################
+
+adjacencyDictionnary = {}
+
+with open(csvFileName) as csvFile, codecs.open(pfad + 'zimmerwunsch.txt','wb','utf-8-sig') as zimmerwunschFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+
+    for row in csvFileReader:
+        if row["Freunde"].strip():
+            listeFreunde = row["Freunde"].strip().split(",")
+            adjacencyDictionnary[row["Vorname"] + " " + row["Nachname"]] = [freund.strip() for freund in listeFreunde]
+
+    #pdb.set_trace()
+    
+    freundeGraph = nx.from_dict_of_lists(adjacencyDictionnary)
+    freundesGruppen = nx.connected_components(freundeGraph)
+
+    for gruppe in freundesGruppen:
+        zimmerwunschFile.write(str(gruppe) + "\n")
 
 ############################
 # Write Emailadressen file #
@@ -239,7 +278,7 @@ emailAdressen = ""
 with open(csvFileName) as csvFile, codecs.open(pfad + 'emailAdressen.txt','wb','utf-8-sig') as emailAdressenFile:
     csvFileReader = csv.DictReader(csvFile, delimiter = ";")
     
-    for row in csv.DictReader(csvFile, delimiter = ";"):
+    for row in csvFileReader:
         if row["E-Mail Eltern"].strip():
             emailAdressen = emailAdressen + ", " + row["E-Mail Eltern"].strip()
         if row["E-Mail Schüler"].strip():
