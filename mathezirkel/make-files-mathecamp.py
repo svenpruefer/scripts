@@ -16,7 +16,7 @@ import networkx as nx
 
 csvFileName = input("CSV-Datei zum Einlesen inklusive des relativen Pfades (Standard 1617_Zirkelteilnehmer.csv): ")
 if len(csvFileName) < 1:
-    csvFileName = "beispiel-tabelle-1.csv"
+    csvFileName = "1617_Camp.csv"
     
 pfad = input("Ort zum Speichern der Output CSV-Dateien (Standard csv/): ")
 if len(pfad) < 1:
@@ -52,7 +52,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'anreise-privat.csv','wb',
     
     anreisePrivatFileWriter.writeheader()
     for row in csvFileReader:
-        if "Privat" in row["Anreise"]:
+        if "Privat" in row["Anreise"] or "Selbst" in row["Anreise"] or "Auto" in row["Anreise"]:
             anreisePrivatFileWriter.writerow({ "Square" : u"\u25A1 ", "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Notfallnummer 1" : row["Notfallnummer 1"], "Notfallnummer 2": row["Notfallnummer 2"], "Notfallnummer 3" : row["Notfallnummer 3"]})
             anzahl = anzahl + 1
         
@@ -88,7 +88,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'abreise-privat.csv','wb',
         
     abreisePrivatFileWriter.writeheader()
     for row in csvFileReader:
-        if "Privat" in row["Abreise"]:
+        if "Privat" in row["Abreise"] or "Selbst" in row["Anreise"] or "Auto" in row["Anreise"]:
             abreisePrivatFileWriter.writerow({ "Square" : u"\u25A1 ", "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Notfallnummer 1" : row["Notfallnummer 1"], "Notfallnummer 2": row["Notfallnummer 2"], "Notfallnummer 3" : row["Notfallnummer 3"]})
             anzahl = anzahl + 1
         
@@ -119,7 +119,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'fahrgemeinschaft.csv','wb
     
     fahrgemeinschaftFileWriter.writeheader()
     for row in csvFileReader:
-        if row["Fahrgemeinschaft"] == "WAHR":
+        if row["Fahrgemeinschaft"] == "TRUE":
             fahrgemeinschaftFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "PLZ" : row["PLZ"], "Ort" : row["Ort"], "E-Mail Eltern" : row["E-Mail Eltern"], "E-Mail Schüler" : row["E-Mail Schüler"]})
             
 ##########################
@@ -198,7 +198,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'geburtstagskinder.csv','w
     geburtstagskinderFileWriter.writeheader()
     for row in csvFileReader:
         [tag, monat, jahr] = [int(i) for i in row["Geburtstag"].strip().split(".")]
-        geburtstag = datetime.date(jahr, monat, tag).replace(year = 1900)
+        geburtstag = datetime.date(jahr, monat, tag).replace(year = 1980)
         if geburtstag >= startTimeMathecamp and geburtstag <= endTimeMathecamp:
             geburtstagskinderFileWriter.writerow({ "Klasse" : row["KlasseID"], "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Geburtstag" : row["Geburtstag"]})
 
@@ -255,9 +255,8 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'zimmerwunsch.txt','wb','u
     csvFileReader = csv.DictReader(csvFile, delimiter = ";")
 
     for row in csvFileReader:
-        if row["Freunde"].strip():
-            listeFreunde = row["Freunde"].strip().split(",")
-            adjacencyDictionnary[row["Vorname"] + " " + row["Nachname"]] = [freund.strip() for freund in listeFreunde]
+        listeFreunde = row["Freunde"].strip().split(",")
+        adjacencyDictionnary[row["Vorname"] + " " + row["Nachname"]] = [freund.strip() for freund in listeFreunde]
 
     #pdb.set_trace()
     
@@ -285,3 +284,11 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'emailAdressen.txt','wb','
             emailAdressen = emailAdressen + ", " + row["E-Mail Schüler"].strip()
 
     emailAdressenFile.write(emailAdressen[2:])
+
+###########################
+# Write Versicherung file #
+###########################
+
+####################################
+# Write Zirkelzusammenfassung file #
+####################################

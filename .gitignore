@@ -4,6 +4,14 @@ test/
 mathezirkel/Praktikum/
 mathezirkel/beispiel-tabelle-1.csv
 mathezirkel/csv/*
+mathezirkel/1617_Camp.csv
+mathezirkel/1617_Camp.ods
+mathezirkel/1617_Campteilnehmer.csv
+mathezirkel/1617_Campteilnehmer.ods
+mathezirkel/1617_Campverwaltung.csv
+mathezirkel/1617_Campverwaltung.ods
+mathezirkel/sql-statement.sql
+mathezirkel/sql-statement.sql~
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
