@@ -14,13 +14,13 @@ import networkx as nx
 # Select file to open #
 #######################
 
-csvFileName = input("CSV-Datei zum Einlesen inklusive des relativen Pfades (Standard 1617_Zirkelteilnehmer.csv): ")
+csvFileName = input("CSV-Datei zum Einlesen inklusive des relativen Pfades (Standard ../1617_camp.csv): ")
 if len(csvFileName) < 1:
-    csvFileName = "1617_Camp.csv"
+    csvFileName = "../1617_camp.csv"
     
-pfad = input("Ort zum Speichern der Output CSV-Dateien (Standard csv/): ")
+pfad = input("Ort zum Speichern der Output CSV-Dateien (Standard ../csv/): ")
 if len(pfad) < 1:
-    pfad = "csv/"
+    pfad = "../csv/"
 
 ##########################
 # Write Anreise Bus file #
@@ -52,7 +52,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'anreise-privat.csv','wb',
     
     anreisePrivatFileWriter.writeheader()
     for row in csvFileReader:
-        if "Privat" in row["Anreise"] or "Selbst" in row["Anreise"] or "Auto" in row["Anreise"]:
+        if row["Anreise"].startswith("Privat") or row["Anreise"].startswith("Selbst") or row["Anreise"].startswith("Auto"):
             anreisePrivatFileWriter.writerow({ "Square" : u"\u25A1 ", "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Notfallnummer 1" : row["Notfallnummer 1"], "Notfallnummer 2": row["Notfallnummer 2"], "Notfallnummer 3" : row["Notfallnummer 3"]})
             anzahl = anzahl + 1
         
@@ -88,7 +88,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'abreise-privat.csv','wb',
         
     abreisePrivatFileWriter.writeheader()
     for row in csvFileReader:
-        if "Privat" in row["Abreise"] or "Selbst" in row["Anreise"] or "Auto" in row["Anreise"]:
+        if row["Abreise"].startswith("Privat") or row["Abreise"].startswith("Selbst") or row["Abreise"].startswith("Auto"):
             abreisePrivatFileWriter.writerow({ "Square" : u"\u25A1 ", "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Notfallnummer 1" : row["Notfallnummer 1"], "Notfallnummer 2": row["Notfallnummer 2"], "Notfallnummer 3" : row["Notfallnummer 3"]})
             anzahl = anzahl + 1
         
@@ -114,13 +114,13 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'ernaehrungseinschraenkung
 
 with open(csvFileName) as csvFile, codecs.open(pfad + 'fahrgemeinschaft.csv','wb','utf-8-sig') as fahrgemeinschaftFile:
     csvFileReader = csv.DictReader(csvFile, delimiter = ";")
-    columnNames = ["Nachname", "Vorname", "PLZ", "Ort", "E-Mail Eltern", "E-Mail Schüler"]
+    columnNames = ["Nachname", "Vorname", "PLZ", "Ort", "E-Mail Eltern", "Festnetz"]
     fahrgemeinschaftFileWriter = csv.DictWriter(fahrgemeinschaftFile, fieldnames = columnNames, delimiter = ";")
     
     fahrgemeinschaftFileWriter.writeheader()
     for row in csvFileReader:
         if row["Fahrgemeinschaft"] == "TRUE":
-            fahrgemeinschaftFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "PLZ" : row["PLZ"], "Ort" : row["Ort"], "E-Mail Eltern" : row["E-Mail Eltern"], "E-Mail Schüler" : row["E-Mail Schüler"]})
+            fahrgemeinschaftFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "PLZ" : row["PLZ"], "Ort" : row["Ort"], "E-Mail Eltern" : row["E-Mail Eltern"], "Festnetz" : row["Festnetz"]})
             
 ##########################
 # Write Instrumente file #
@@ -256,7 +256,7 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'zimmerwunsch.txt','wb','u
 
     for row in csvFileReader:
         listeFreunde = row["Freunde"].strip().split(",")
-        adjacencyDictionnary[row["Vorname"] + " " + row["Nachname"]] = [freund.strip() for freund in listeFreunde]
+        adjacencyDictionnary[row["Vorname"] + " " + row["Nachname"]] = [freund.strip() for freund in listeFreunde if freund.strip() != ""]
 
     #pdb.set_trace()
     
@@ -264,7 +264,8 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'zimmerwunsch.txt','wb','u
     freundesGruppen = nx.connected_components(freundeGraph)
 
     for gruppe in freundesGruppen:
-        zimmerwunschFile.write(str(gruppe) + "\n")
+        if len(gruppe) > 1:
+            zimmerwunschFile.write(str(gruppe) + "\n")
 
 ############################
 # Write Emailadressen file #
@@ -289,6 +290,37 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'emailAdressen.txt','wb','
 # Write Versicherung file #
 ###########################
 
+with open(csvFileName) as csvFile, codecs.open(pfad + 'versicherung.csv','wb','utf-8-sig') as versicherungFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    columnNames = ["Nachname", "Vorname", "Geburtsdatum", "Betreuer"]
+    versicherungFileWriter = csv.DictWriter(versicherungFile, fieldnames = columnNames, delimiter = ";")
+    versicherungFileWriter.writeheader()
+    
+    for row in csvFileReader:
+        versicherungFileWriter.writerow({"Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Geburtsdatum" : row["Geburtstag"], "Betreuer" : "Nein"})
+
+
 ####################################
 # Write Zirkelzusammenfassung file #
 ####################################
+
+##########################################
+# Print Geschlechterverteilung on Screen #
+##########################################
+
+maennlich = 0
+weiblich = 0
+with open(csvFileName) as csvFile:
+    csvFileReader = csv.DictReader(csvFile, delimiter = ";")
+    
+    for row in csvFileReader:
+        if row["Geschlecht"] == "m":
+            maennlich = maennlich + 1
+        elif row["Geschlecht"] == "w":
+            weiblich = weiblich + 1
+        else:
+            print("Unklares Geschlecht entdeckt.")
+
+print("Männliche Teilnehmer: " + str(maennlich) + "\n")
+print("Weibliche Teilnehmerinnen: " + str(weiblich) + "\n")
+
