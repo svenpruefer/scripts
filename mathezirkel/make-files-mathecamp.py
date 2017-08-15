@@ -198,7 +198,8 @@ with open(csvFileName) as csvFile, codecs.open(pfad + 'geburtstagskinder.csv','w
     geburtstagskinderFileWriter.writeheader()
     for row in csvFileReader:
         [tag, monat, jahr] = [int(i) for i in row["Geburtstag"].strip().split(".")]
-        geburtstag = datetime.date(jahr, monat, tag).replace(year = 1980)
+        #pdb.set_trace()
+        geburtstag = datetime.date(jahr, monat, tag).replace(year = 1900)
         if geburtstag >= startTimeMathecamp and geburtstag <= endTimeMathecamp:
             geburtstagskinderFileWriter.writerow({ "Klasse" : row["KlasseID"], "Nachname" : row["Nachname"], "Vorname" : row["Vorname"], "Geburtstag" : row["Geburtstag"]})
 
